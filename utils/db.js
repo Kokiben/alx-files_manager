@@ -17,11 +17,12 @@ class DBClient {
     }
 
     isAlive() {
-        return this.client && this.client.isConnected();
+        return this.client && this.client.topology && this.client.topology.isConnected();
     }
 
     async nbUsers() {
         try {
+            if (!this.db) throw new Error('Database not initialized');
             const usersCollection = this.db.collection('users');
             return await usersCollection.countDocuments();
         } catch (error) {
@@ -32,6 +33,7 @@ class DBClient {
 
     async nbFiles() {
         try {
+            if (!this.db) throw new Error('Database not initialized');
             const filesCollection = this.db.collection('files');
             return await filesCollection.countDocuments();
         } catch (error) {
@@ -42,4 +44,4 @@ class DBClient {
 }
 
 const dbClient = new DBClient();
-export default dbClient; 
+export default dbClient;
