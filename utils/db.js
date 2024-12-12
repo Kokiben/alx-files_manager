@@ -1,70 +1,66 @@
-import { env } from 'process';
-import { MongoClient, ObjectId } from 'mongodb';
+import mongodb from 'mongodb';
+// eslint-disable-next-line no-unused-vars
+import Collection from 'mongodb/lib/collection';
+import envLoader from './env_loader';
 
-// eslint-disable-next-line import/prefer-default-export
-export class DBClient {
+/**
+ * Represents a MongoDB client.
+ */
+class DBClient {
+  /**
+   * Creates a new DBClient instance.
+   */
   constructor() {
-    const host = env.DB_PORT ? env.DB_PORT : '127.0.0.1';
-    const port = env.DB_HOST ? env.DB_HOST : 27017;
-    const database = env.DB_DATABASE ? env.DB_DATABASE : 'files_manager';
-    this.myClient = MongoClient(`mongodb://${host}:${port}/${database}`);
-    this.myClient.connect();
+    envLoader();
+    const host = process.env.DB_HOST || 'localhost';
+    const port = process.env.DB_PORT || 27017;
+    const database = process.env.DB_DATABASE || 'files_manager';
+    const dbURL = `mongodb://${host}:${port}/${database}`;
+
+    this.client = new mongodb.MongoClient(dbURL, { useUnifiedTopology: true });
+    this.client.connect();
   }
 
+  /**
+   * Checks if this client's connection to the MongoDB server is active.
+   * @returns {boolean}
+   */
   isAlive() {
-    return this.myClient.isConnected();
+    return this.client.isConnected();
   }
 
+  /**
+   * Retrieves the number of users in the database.
+   * @returns {Promise<Number>}
+   */
   async nbUsers() {
-    /* returns number of documents in the collection users */
-    const myDB = this.myClient.db();
-    const myCollection = myDB.collection('users');
-    return myCollection.countDocuments();
+    return this.client.db().collection('users').countDocuments();
   }
 
+  /**
+   * Retrieves the number of files in the database.
+   * @returns {Promise<Number>}
+   */
   async nbFiles() {
-    /* returns number of documents in the collection files */
-    const myDB = this.myClient.db();
-    const myCollection = myDB.collection('files');
-    return myCollection.countDocuments();
+    return this.client.db().collection('files').countDocuments();
   }
 
-  async userExists(email) {
-    /* returns true if the user with the given email exists */
-    const myDB = this.myClient.db();
-    const myCollection = myDB.collection('users');
-    return myCollection.findOne({ email });
+  /**
+   * Retrieves a reference to the `users` collection.
+   * @returns {Promise<Collection>}
+   */
+  async usersCollection() {
+    return this.client.db().collection('users');
   }
 
-  async newUser(email, passwordHash) {
-    /* creates a new user with the given email and passwordHash */
-    const myDB = this.myClient.db();
-    const myCollection = myDB.collection('users');
-    return myCollection.insertOne({ email, passwordHash });
-  }
-
-  async filterUser(filters) {
-    const myDB = this.myClient.db();
-    const myCollection = myDB.collection('users');
-    if ('_id' in filters) {
-      // eslint-disable-next-line no-param-reassign
-      filters._id = ObjectId(filters._id);
-    }
-    return myCollection.findOne(filters);
-  }
-
-  async filterFiles(filters) {
-    const myDB = this.myClient.db();
-    const myCollection = myDB.collection('files');
-    const idFilters = ['_id', 'userId', 'parentId'].filter((prop) => prop in filters && filters[prop] !== '0');
-    idFilters.forEach((i) => {
-      // eslint-disable-next-line no-param-reassign
-      filters[i] = ObjectId(filters[i]);
-    });
-    return myCollection.findOne(filters);
+  /**
+   * Retrieves a reference to the `files` collection.
+   * @returns {Promise<Collection>}
+   */
+  async filesCollection() {
+    return this.client.db().collection('files');
   }
 }
 
-const dbClient = new DBClient();
-
+export const dbClient = new DBClient();
 export default dbClient;
