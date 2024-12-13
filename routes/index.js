@@ -16,10 +16,10 @@ router.get('/disconnect', AuthController.getDisconnect);
 router.get('/users/me', UsersController.getMe);
 
 // FilesController routes
-router.post('/files', FilesController.postUpload);
-router.get('/files/:id', FilesController.getShow);
-router.get('/files', FilesController.getIndex);
-router.put('/files/:id/publish', FilesController.putPublish);  // New route to publish a file
-router.put('/files/:id/unpublish', FilesController.putUnpublish);  // New route to unpublish a file
+router.post('/files', FilesController.postUpload);  // Upload a file
+router.get('/files/:id', FilesController.getShow);  // Show a file by ID
+router.get('/files', FilesController.getIndex);  // List all files
+router.put('/files/:id/publish', FilesController.putPublish);  // Publish a file
+router.put('/files/:id/unpublish', FilesController.putUnpublish);  // Unpublish a file
 
 export default router;
