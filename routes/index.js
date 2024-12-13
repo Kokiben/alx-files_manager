@@ -19,5 +19,7 @@ router.get('/users/me', UsersController.getMe);
 router.post('/files', FilesController.postUpload);
 router.get('/files/:id', FilesController.getShow);
 router.get('/files', FilesController.getIndex);
+router.put('/files/:id/publish', FilesController.putPublish);  // New route to publish a file
+router.put('/files/:id/unpublish', FilesController.putUnpublish);  // New route to unpublish a file
 
 export default router;
