@@ -9,28 +9,36 @@ class DBClient {
       useNewUrlParser: true,
       useUnifiedTopology: true,
     });
-    this.client.connect();
-    this.db = this.client.db(this.database);
+    this.db = null;
+    this._connect();
   }
 
-  isAlive() {
-    return !!this.client && this.client.isConnected();
+  async _connect() {
+    try {
+      await this.client.connect();
+      this.db = this.client.db(this.database);
+      console.log('Connected to the database');
+    } catch (error) {
+      console.error('Failed to connect to the database:', error.message);
+    }
+  }
+
+  async isAlive() {
+    return !!this.db && this.client.topology.isConnected();
   }
 
   async nbUsers() {
-    if (!this.isAlive()) return 0;
+    if (!(await this.isAlive())) return 0;
 
     const usersCollection = this.db.collection('users');
-    const numberOfUsers = await usersCollection.countDocuments();
-    return numberOfUsers;
+    return usersCollection.countDocuments({});
   }
 
   async nbFiles() {
-    if (!this.isAlive()) return 0;
+    if (!(await this.isAlive())) return 0;
 
     const filesCollection = this.db.collection('files');
-    const numberOfFiles = await filesCollection.countDocuments();
-    return numberOfFiles;
+    return filesCollection.countDocuments({});
   }
 }
 
