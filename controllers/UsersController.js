@@ -1,5 +1,6 @@
 import crypto from 'crypto';
-import { MongoClient } from 'mongodb';
+import { MongoClient, ObjectId } from 'mongodb';
+import { userQueue } from '../worker';
 
 class UsersController {
   static async postNew(req, res) {
@@ -35,6 +36,9 @@ class UsersController {
 
       // Insert the new user into the database
       const result = await usersCollection.insertOne(newUser);
+
+      // Add the job to the userQueue
+      await userQueue.add({ userId: result.insertedId });
 
       // Return success response with user id and email
       return res.status(201).json({ id: result.insertedId, email });
