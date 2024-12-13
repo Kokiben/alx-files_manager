@@ -2,18 +2,18 @@ import { MongoClient } from 'mongodb';
 import redisClient from '../utils/redisClient.js'; // Assuming a redis client is available for managing tokens
 
 class FilesController {
+  // Existing method for uploading a file
   static async postUpload(req, res) {
-    // Existing postUpload method
     // (Implementation from previous answer)
   }
 
+  // Existing method for showing a file
   static async getShow(req, res) {
-    // Existing getShow method
     // (Implementation from previous answer)
   }
 
+  // Existing method for listing files
   static async getIndex(req, res) {
-    // Existing getIndex method
     // (Implementation from previous answer)
   }
 
